@@ -32,16 +32,24 @@ def get_logs() -> list[dict]:
     return sb.table("workout_logs").select("*").order("date", desc=True).execute().data
 
 
-def save_log(exercise_name, date, weight_kg, unit, reps, rir, is_dropset, notes) -> None:
+def save_log(exercise_name, date, weight_input, unit, reps, rir, is_dropset, notes) -> None:
+    from utils.units import to_kg, to_lb
+
+    # Calcular ambas representaciones a partir del valor ingresado
+    weight_kg = to_kg(weight_input, unit)
+    weight_lb = to_lb(weight_input, unit)
+
     sb.table("workout_logs").insert({
         "exercise_name": exercise_name,
-        "date": date.isoformat(),
-        "weight": float(weight_kg),   # siempre en kg en la BD
-        "unit": unit,                  # unidad con la que se registró
-        "reps": int(reps),
-        "rir": int(rir) if rir is not None else None,
-        "is_dropset": is_dropset,
-        "notes": notes or None,
+        "date":          date.isoformat(),
+        "weight":        weight_kg,   # columna original, mantenerla por compatibilidad
+        "weight_kg":     weight_kg,
+        "weight_lb":     weight_lb,
+        "unit":          unit,        # unidad con la que se ingresó
+        "reps":          int(reps),
+        "rir":           int(rir) if rir is not None else None,
+        "is_dropset":    is_dropset,
+        "notes":         notes or None,
     }).execute()
 
 

@@ -5,19 +5,25 @@ UNITS = ["kg", "lb"]
 
 
 def to_kg(value: float, unit: str) -> float:
-    """Convierte cualquier unidad a kg para guardar en BD."""
+    """Convierte valor ingresado a kg."""
     if unit == "lb":
         return round(value * LB_TO_KG, 2)
     return round(value, 2)
 
 
-def from_kg(value_kg: float, unit: str) -> float:
-    """Convierte kg (almacenado en BD) a la unidad deseada para mostrar."""
-    if unit == "lb":
-        return round(value_kg * KG_TO_LB, 1)
-    return round(value_kg, 2)
+def to_lb(value: float, unit: str) -> float:
+    """Convierte valor ingresado a lb."""
+    if unit == "kg":
+        return round(value * KG_TO_LB, 2)
+    return round(value, 2)
 
 
-def format_weight(value_kg: float, unit: str) -> str:
-    """Devuelve string formateado: '80 kg' o '176.4 lb'."""
-    return f"{from_kg(value_kg, unit)} {unit}"
+def pick_weight(row: dict, display_unit: str) -> float:
+    """Elige la columna correcta de la BD según la unidad de display."""
+    if display_unit == "lb":
+        return row.get("weight_lb") or round((row.get("weight_kg") or row.get("weight", 0)) * KG_TO_LB, 2)
+    return row.get("weight_kg") or row.get("weight", 0)
+
+
+def format_weight(row: dict, display_unit: str) -> str:
+    return f"{pick_weight(row, display_unit)} {display_unit}"

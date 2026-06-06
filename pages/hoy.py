@@ -15,7 +15,6 @@ def render(display_unit: str) -> None:
     df = pd.DataFrame(logs)
     df["date"] = pd.to_datetime(df["date"])
     hoy = datetime.now().date()
-
     df_hoy = df[df["date"].dt.date == hoy]
 
     st.markdown(f"**{hoy.strftime('%A %d de %B').capitalize()}**")
@@ -29,14 +28,12 @@ def render(display_unit: str) -> None:
                 badges += '<span class="badge-ds">DROPSET</span> '
             if pd.notna(row.get("rir")):
                 badges += f'<span class="badge-rir">RIR {int(row["rir"])}</span>'
-
             note_html = f"<div class='note'>{row['notes']}</div>" if row.get("notes") else ""
-            weight_str = format_weight(row["weight"], display_unit)
 
             st.markdown(f"""
             <div class="log-card">
                 <div class="exname">{row['exercise_name']}</div>
-                <div class="detail">{weight_str} × {int(row['reps'])} reps &nbsp;{badges}</div>
+                <div class="detail">{format_weight(row, display_unit)} × {int(row['reps'])} reps &nbsp;{badges}</div>
                 {note_html}
             </div>""", unsafe_allow_html=True)
 
